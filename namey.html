@@ -21460,21 +21460,30 @@ Zymosis
     <script>
       // Reference: http://www.html5rocks.com/en/tutorials/speed/animations/
 
+      let $window, $document, $container;
+
       let last_known_scroll_position = 0;
       let animating = false;
       let scroll_count = 0, animate_count = 0;
 
       const doSomething = (scroll_pos) => {
         // do something with the scroll position
-        console.log('doSomething: scroll_count,animate_count,scroll_pos:', scroll_count,animate_count,scroll_pos);
-        //console.log('  : document.body.clientHeight:', document.body.clientHeight);
-        const element = document.body;
-        //const element = document.getElementById('container');
+        console.log('doSomething:');
+
+	const element = document.body;
         const domRect = element.getBoundingClientRect();
-        console.log('domRect:');
-        console.log('x', domRect.x, 'left', domRect.left, ' right', domRect.right,  ' innerWidth', window.innerWidth);
-        console.log('y', domRect.y, ' top', domRect.top,  'bottom', domRect.bottom, 'innerHeight', window.innerHeight);
-        console.log('scrollHeight, scrollTop, clientHeight:', element.scrollHeight, element.scrollTop, element.clientHeight);
+
+        console.log('scroll_count,animate_count:', scroll_count, animate_count);
+        console.log('scroll_pos', scroll_pos, ' scrollHeight', element.scrollHeight, ' scrollTop', element.scrollTop, ' $window.scrollTop()', $window.scrollTop(), ' clientHeight', element.clientHeight);
+	console.log('scrollBottom', $document.height() - $window.height() - $window.scrollTop());
+        console.log('bodyRect:');
+        console.log('x', domRect.x, ' left', domRect.left, ' right', domRect.right);
+        console.log('y', domRect.y, ' top', domRect.top,  ' bottom', domRect.bottom);
+
+
+        console.log('dom width', domRect.width, ' $document.width', $document.width(), ' $window.width', $window.width(), ' innerWidth', window.innerWidth);
+        console.log('dom height', domRect.height, ' document.body.clientHeight', document.body.clientHeight, ' document.body.height', document.body.height, ' $document.height', $document.height(), ' $window.height', $window.height(), ' innerHeight', window.innerHeight);
+	console.log('$window.scrollTop()', $window.scrollTop(), '+ $window.height()', $window.height(), '=', $window.scrollTop() + $window.height(), ' $document.height()', $document.height());
       }
 
       window.addEventListener('scroll', (e) => {
@@ -21485,26 +21494,36 @@ Zymosis
           window.requestAnimationFrame(() => {
             ++animate_count;
             doSomething(last_known_scroll_position);
+	    ensureNames();
+            doSomething('after ensureNames');
             animating = false;
           });
           animating = true;
         }
       });
 
-      //const [ $window, $document, $container ] = [ $(window), $(document), $('body') ];
-      const [ $window, $document, $container ] = [ $(window), $(document), $('#container') ];
       //const appendName = () => $('<div>').html(getName()).appendTo($container);
       const appendName = () => $('<p>').html(getName()).appendTo($container);
       const ensureNames = () => {
         //console.log($window.scrollTop(), $window.height(), $document.height());
-        while (Math.ceil($window.scrollTop() + $window.height()  >= $document.height()) {
-          console.log('name:', $window.scrollTop(), $window.height(), $document.height());
+        while (Math.ceil($window.scrollTop() + $window.height())  >= $document.height()) {
+          console.log('name:', $window.scrollTop(), '+', $window.height(), '=', $window.scrollTop() + $window.height(), '>=', $document.height());
           appendName();
+          console.log('     ', $window.scrollTop(), '+', $window.height(), '=', $window.scrollTop() + $window.height(), '<', $document.height());
         }
       };
 
-      ensureNames();
-      $window.scroll(ensureNames);
+      $( window ).on( 'load', () => {
+          console.log('window on load');
+
+          //const [ $window, $document, $container ] = [ $(window), $(document), $('body') ];
+          [ $window, $document, $container ] = [ $(window), $(document), $('#container') ];
+
+          ensureNames();
+	  //          $window.scroll(ensureNames);
+
+	  });
+
     </script>
 
   </body>
